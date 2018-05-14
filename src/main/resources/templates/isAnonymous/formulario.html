@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="fragments/config-html-css-js :: header" />
+<head>
+
+<script type="text/javascript">
+	jQuery(function($) {
+		
+		var email = "";
+		var login = "";
+		
+		$("#cpf").attr("readonly", true);
+		$("#cpf").css("background-color", "#cccccc");
+			
+		
+		$(".cpf").mask("999.999.999-99", {
+			autoclear : false,
+			placeholder : ""
+		});
+		$(".cep").mask("99.999-999", {
+			autoclear : false,
+			placeholder : ""
+		});
+
+		$(".telefone").keyup(function() {
+			if ($(this).val().length >= 15) {
+				$(this).mask('(99)99999-999?9', {
+					autoclear : false,
+					placeholder : ""
+				});
+			} else {
+				$(this).mask('(99)9999-9999?9', {
+					autoclear : false,
+					placeholder : ""
+				});
+			}
+		});
+
+		$("#btnCancelar").click(function() {
+			$(location).attr('href', '/');
+		});
+
+		$("#form").validator();
+		$("#btnSalvar").click(function(e) {
+			if (!$("#form").data("bs.validator").validate().hasErrors()) {
+				console.log("Não contêm erros no formulário...");
+				var dados = jQuery($("#form")).serialize();
+
+				$.ajax({
+					url : "/usuario/checks",
+					type : "get",
+					data : dados,
+					success : function(response) {
+						response = typeof response == 'string' ? JSON.parse(response) : response;
+						var checks = true;
+						
+							if(response["login"] == true){
+								$(".check-login").text("Login já cadastrado");
+								checks = false;
+							} else {
+								$(".check-login").text("");
+							}
+					
+							if(response["email"] == true){
+								$(".check-email").text("Email já cadastrado");
+								checks = false;
+							} else {
+								$(".check-email").text("");
+							}
+					
+
+						if(checks == true){
+							$.ajax({
+								url : "/usuario",
+								type : "post",
+								data : dados,
+								success : function(response) {
+									console.log(response);
+									console.log("Gravado com sucesso!!!");
+								},
+								error : function(jqXHR, textStatus, errorThrown) {
+									console.log(textStatus, errorThrown);
+								}
+							});
+							$(location).attr('href', '/');
+						}
+						
+					},
+					error : function(jqXHR, textStatus, errorThrown) {
+						console.log(textStatus, errorThrown);
+					}
+				});
+				return false;
+			} else {
+				console.log("Contêm erros no formulário... =(");
+			}
+		});
+
+	});
+</script>
+ 
+</head>
+<body>
+
+	<div class="form-group" id="formularioUsuario">
+		<input id="role" type="hidden" th:field="${usuario.roles[0].nomeRole}"/>
+		<h3 id="cabecalho-pagina" class="page-header">Novo usuário</h3>
+
+		<form class="form form-group" id="form" th:object="${usuario}">
+			<div class="row">
+				<input type="hidden" th:field="${usuario.id}" name="id" />
+				<input type="hidden" th:field="${usuario.morador.id}" name="morador.id" />
+				<input type="hidden" th:field="${usuario.morador.endereco.id}" name="morador.endereco.id" />
+				<input type="hidden" th:field="${usuario.morador.contatos[0].id}" name="morador.contatos[0].id" />
+				<input type="hidden" th:field="${usuario.morador.contatos[1].id}" name="morador.contatos[1].id" />
+				
+				<div class="form-group col-md-8">
+					<label for="nome">Nome</label> <input type="text"
+						th:field="${usuario.morador.nome}" class="form-control"
+						name="morador.nome" id="nome" required="required"
+						data-minlength="6" maxlength="50" placeholder="Digite o nome"
+						autofocus="true" data-required-error="Campo obrigatório"
+						data-minlength-error="Mínimo 6 caracteres" />
+					<div class="help-block with-errors"></div>
+				</div>
+				<div class="form-group col-md-4">
+					<label for="cpf">CPF</label> <input type="tel"
+						th:field="${usuario.morador.cpf}" class="form-control cpf"
+						name="morador.cpf" id="cpf" required="required"
+						data-minlength="14" placeholder="cpf com 11 números"
+						data-required-error="Campo obrigatório"
+						data-minlength-error="CPF com 11 números" />
+					<div class="help-block with-errors check-cpf"></div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="form-group col-md-2">
+					<label for="cep">CEP</label> <input type="tel"
+						th:field="${usuario.morador.endereco.cep}" class="form-control cep" name="morador.endereco.cep" id="cep"
+						placeholder="CEP 8 dígitos" data-minlength="10"
+						data-minlength-error="Se preenchido, necessário 8 números" />
+					<div class="help-block with-errors"></div>
+				</div>
+				<div class="form-group col-md-5">
+					<label for="rua">Rua</label> <input type="text"
+						th:field="${usuario.morador.endereco.rua}" class="form-control" name="morador.endereco.rua" id="rua"
+						required="required" data-minlength="3" maxlength="50"
+						placeholder="Nome da Rua, Travessa, Avenida etc..."
+						data-required-error="Campo obrigatório"
+						data-minlength-error="Mínimo 3 caracteres" />
+					<div class="help-block with-errors"></div>
+				</div>
+				<div class="form-group col-md-2">
+					<label for="numero">Número</label> <input type="tel"
+						th:field="${usuario.morador.endereco.numero}" class="form-control numero" name="morador.endereco.numero"
+						id="numero" required="required" data-minlength="1"
+						placeholder="Número da residência"
+						data-required-error="Campo obrigatório"
+						data-minlength-error="Mínimo 1 número" />
+					<div class="help-block with-errors"></div>
+				</div>
+				<div class="form-group col-md-3">
+					<label for="complemento">Complemento</label> <input type="text"
+						th:field="${usuario.morador.endereco.complemento}" class="form-control" name="morador.endereco.complemento"
+						id="complemento" data-minlength="1" maxlength="20"
+						placeholder="Complemento"
+						data-minlength-error="Mínimo 1 caracteres" />
+					<div class="help-block with-errors"></div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="form-group col-md-4">
+					<label for="bairro">Bairro</label> <input type="text"
+						th:field="${usuario.morador.endereco.bairro}" class="form-control" name="morador.endereco.bairro" id="bairro"
+						required="required" data-minlength="2" maxlength="25"
+						placeholder="Nome do bairro"
+						data-required-error="Campo obrigatório"
+						data-minlength-error="Mínimo 2 caracteres" />
+					<div class="help-block with-errors"></div>
+				</div>
+				<div class="form-group col-md-4">
+					<label for="cidade">Cidade</label> <input type="text"
+						th:field="${usuario.morador.endereco.cidade}" class="form-control" name="morador.endereco.cidade" id="cidade"
+						required="required" data-minlength="2" maxlength="25"
+						placeholder="Nome da cidade"
+						data-required-error="Campo obrigatório"
+						data-minlength-error="Mínimo 2 caracteres" />
+					<div class="help-block with-errors"></div>
+				</div>
+				<div class="form-group col-md-4">
+					<label for="estado">Estado</label> <input type="text"
+						th:field="${usuario.morador.endereco.estado}" class="form-control" name="morador.endereco.estado" id="estado"
+						required="required" data-minlength="2" maxlength="20"
+						placeholder="Nome do estado"
+						data-required-error="Campo obrigatório"
+						data-minlength-error="Mínimo 2 caracteres" />
+					<div class="help-block with-errors"></div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="form-group col-md-3">
+					<label for="celular">Tel. 01</label> <input type="tel"
+						th:field="${usuario.morador.contatos[0].numero}" class="form-control telefone" name="morador.contatos[0].numero"
+						id="celular" required="required" data-minlength="13"
+						placeholder="Número tel. celular"
+						data-required-error="Campo obrigatório"
+						data-minlength-error="Número inválido" />
+					<div class="help-block with-errors"></div>
+				</div>
+				<div class="form-group col-md-3">
+					<label for="residencia">Tel. 02</label> <input type="tel"
+						th:field="${usuario.morador.contatos[1].numero}" class="form-control telefone" name="morador.contatos[1].numero"
+						id="residencia" placeholder="Número tel. residência" 
+						data-minlength="13" data-minlength-error="Número inválido"/>
+					<div class="help-block with-errors"></div>
+				</div>
+				<div class="form-group col-md-6">
+					<label for="email">Email</label> <input type="email"
+						th:field="${usuario.morador.email}" class="form-control" name="morador.email" id="email"
+						required="required" maxlength="60"
+						placeholder="Digite seu endereço de email"
+						data-error="Formato do email é inválido" />
+					<div class="help-block with-errors check-email"></div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="form-group col-md-3">
+					<label for="login">Login</label> <input type="text"
+						th:field="${usuario.login}" class="form-control" name="login" id="login" required="required"
+						data-minlength="6" maxlength="15" placeholder="Mín:6 Máx:15"
+						data-required-error="Campo obrigatório"
+						data-minlength-error="Mínimo 6 caracteres" />
+					<div class="help-block with-errors check-login"></div>
+				</div>
+				<div class="form-group col-md-2">
+					<label for="senha">Senha</label> <input type="password"
+						class="form-control" name="senha" id="senha" required="required"
+						data-minlength="6" maxlength="15" placeholder="Mín:6 Máx:15"
+						data-required-error="Campo obrigatório"
+						data-minlength-error="Mínimo 6 caracteres" />
+					<div class="help-block with-errors"></div>
+				</div>
+				<div class="form-group col-md-2">
+					<label for="senha">Repita a Senha</label> <input type="password"
+						class="form-control" id="senha2" required="required"
+						data-minlength="6" maxlength="15" placeholder="Mín:6 Máx:15"
+						data-match="#senha" data-match-error="As senhas não são iguais."
+						data-required-error="Campo obrigatório"
+						data-minlength-error="Mínimo 6 caracteres" />
+					<div class="help-block with-errors"></div>
+				</div>
+				
+				<div sec:authorize="hasRole('ROLE_ADMIN')" class="form-group col-md-3">
+					<label for="nivelAcesso">Nível de acesso</label> <select
+						class="form-control" name="roles[0].nomeRole" th:field="${usuario.roles[0]}">
+						
+						<option th:each="role : ${roles}" th:value="${role.nomeRole}"
+							th:text="${role.descricao}"></option>
+					</select>
+				</div>
+				<div sec:authorize="hasRole('ROLE_ADMIN')" class="form-group col-md-2">
+					<label for="status">Situação</label> <select name="situacao" th:field="${usuario.situacao}"
+						class="form-control">
+						<option th:value="true" th:text="Ativo"></option>
+						<option th:value="false" th:text="Inativo"></option>
+					</select>
+				</div>
+			</div>
+
+			<hr />
+
+			<div class="row">
+				<div class="col-md-12">
+					<input type="submit" id="btnSalvar" class="btn btn-primary" value="Salvar" />
+					<button type="button" id="btnCancelar" class="btn btn-primary">Cancelar</button>
+				</div>
+			</div>
+
+		</form>
+	</div>
+ <div th:replace="fragments/footer :: footer" />
+</body>
+
+</html>

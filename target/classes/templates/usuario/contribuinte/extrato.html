@@ -1,0 +1,38 @@
+<script type="text/javascript">
+	jQuery(function($) {
+		$(".btn-voltar").click(function() {
+			$.ajaxSetup({cache : false});
+			$(".divBase").show("show");			
+			$("#divExibir").empty();
+		});
+	});
+</script>
+<h3 class="page-header">Extrato de pagamento(s)</h3>
+<div class="table-responsive">
+	<table class="table table-extrato">
+		<thead class="thead-light">
+			<tr>
+				<th>Descrição</th>
+				<th>Parcela</th>
+				<th>Data vencimento</th>
+				<th>Valor</th>
+				<th>Data pagamento</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="fatura : ${faturas}">
+				<td th:text="${fatura.descricao}"></td>
+				<td th:text="${fatura.parcela}"></td>
+				<td th:text="${fatura.dataVencimento}"></td>
+				<td th:text="${fatura.valor}"></td>
+				<td th:text="${fatura.dataPagamento}"></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div class="row">
+	<div class="col-md-2 col-md-offset-1">
+		<a href="#" class="btn-voltar btn btn-primary btn-block">Voltar</a>
+	</div>
+</div>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>SCPM Login</title>
+
+	<div th:replace="fragments/config-html-css-js :: header" />
+	<script type="text/javascript">
+		jQuery(function($) {
+			$(".cpf").mask("999.999.999-99", {
+				autoclear : false,
+				placeholder : ""
+			});
+			
+			$(".alert").fadeTo(2000, 500).slideUp(500, function(){
+			    $("#success-alert").alert('close');
+			});
+			
+			$(".btnCadastro").click(function() {
+				$(".divLogin").hide("slow");
+				$(".divVerificaCpf").show("slow");
+				$.ajaxSetup({cache : false});
+				//$("#divUsuarioFormulario").load("../administrador/usuario/formulario/" + $(this).attr("id"));
+			});
+			
+			$("#formCpfAutorizado").validator();
+			$(".btnVerificar").click(function() {
+				if (!$("#formCpfAutorizado").data("bs.validator").validate().hasErrors()) {
+					console.log("Não contêm erros no formulário...");
+					var dados = jQuery($("#formCpfAutorizado")).serialize();
+
+					$.ajax({
+						url : "/cpfAutorizado",
+						type : "get",
+						data : dados,
+						success : function(response) {
+							response = typeof response == 'string' ? JSON.parse(response) : response;
+							if(!response["Autorizado"]){
+								$(".check-cpf").text("CPF não autorizado a se cadastrar");
+							} else if (response["Cadastrado"]){
+								$(".check-cpf").text("CPF já cadastrado");
+							} else {
+								$(".check-cpf").text("CPF apto para cadastramento...");
+								$(location).attr('href', '/isAnonymous/' + $("#cpf").val() + "/formulario");
+							}
+							
+						},
+						error : function(jqXHR, textStatus, errorThrown) {
+							console.log(textStatus, errorThrown);
+						}
+					});
+					return false;
+				} else {
+					console.log("Contêm erros no formulário... =(");
+				}
+			});
+			
+			$(".btnCancelar").click(function() {
+				$(".divLogin").show("slow");
+				$(".divVerificaCpf").hide("slow");
+				$.ajaxSetup({cache : false});
+				$("#cpf").val("");
+				//$("#divUsuarioFormulario").load("../administrador/usuario/formulario/" + $(this).attr("id"));
+			});
+			
+		});
+			
+	</script>
+</head>
+<body>
+
+	<div th:replace="fragments/header :: header" />
+
+	<div sec:authorize="isAnonymous()" class="container">
+
+		<div class="row divLogin">
+			<div class="col-xs-12 col-sm-6 col-md-4 col-sm-offset-3 col-md-offset-4">
+				<form class="form-login" th:action="@{/signin}" method="post"
+					data-toggle="validator">
+					<fieldset>
+						<h3 class="page-header">Login</h3>
+
+						<div th:if="${param.error}">
+							<div class="alert alert-danger">CPF ou Senha inválido.</div>
+						</div>
+						<div th:if="${param.logout}">
+							<div class="alert alert-info">Desconectado com sucesso!!!.
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="login">Login</label> <input type="text"
+								name="username" id="login" class="form-control input-lg"
+								placeholder="Mín:6 Máx:15" autofocus="true"
+								required="required" maxlength="15" data-minlength="6"
+								data-required-error="Campo obrigatório"
+								data-minlength-error="Mínimo 6 caracteres" />
+								<div class="help-block with-errors"></div>
+						</div>
+						<div class="form-group">
+							<label for="senha">Senha</label> <input type="password"
+								name="password" id="senha" class="form-control input-lg"
+								placeholder="Mín:6 Máx:15" required="true" maxlength="15"
+								data-minlength="6"
+								
+								data-required-error="Campo obrigatório"
+								data-minlength-error="Mínimo 6 caracteres"/>
+								<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="row">
+							<div class="col-xs-5 col-sm-5 col-md-5 col-xs-offset-1 col-sm-offset-1 col-md-offset-1">
+								<input type="submit" class="btn btn-lg btn-primary btn-block" value="Login" />
+							</div>
+							<div class="col-xs-5 col-sm-5 col-md-5">
+								<input type="button" class="btn btn-lg btn-primary btn-block btnCadastro" value="Cadastro" />
+							</div>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+		</div>
+		
+		<div class="divVerificaCpf" style="display:none;">
+			<div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+			<h4 class="page-header">Verifica se o CPF pertence a um morador contribuinte</h4>
+
+			<form id="formCpfAutorizado" class="form form-group" th:object="${cpfAutorizado}">
+				<div class="row">
+					<div class="col-md-8 col-md-offset-2 form-group">
+						<label for="cpf">CPF</label> 
+						<input type="text" name="cpf" id="cpf" placeholder="Digite o CPF" class="form-control cpf"
+						required="required" data-minlength="14" data-required-error="Campo obrigatório"
+						data-minlength-error="CPF com 11 números" />
+						<div class="help-block with-errors check-cpf"></div>
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="col-xs-5 col-sm-5 col-md-5 col-xs-offset-1 col-sm-offset-1 col-md-offset-1">
+						<input type="submit" class="btn btn-lg btn-primary btn-block btnVerificar" value="Verificar" />
+					</div>
+					<div class="col-xs-5 col-sm-5 col-md-5">
+						<input type="button" class="btn btn-lg btn-primary btn-block btnCancelar" value="Cancelar" />
+					</div>
+				</div>
+			</form>
+			</div>
+		</div>
+		
+		<br />
+		<br />
+	</div>
+	
+	<div sec:authorize="isAuthenticated()" class="container">
+		<h3>Sr(a) <span th:text="${nome}"></span> já se encontra logado(a)!</h3>
+		<a href="/logout" class="btn btn-lg btn-primary" >Sair</a>
+		<br />
+		<br />
+	</div>
+	
+	<div th:replace="fragments/footer :: footer" />
+
+</body>
+</html>

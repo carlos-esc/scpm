@@ -1,0 +1,33 @@
+<div class="divBase" id="divAdministradorMenu">	
+	<script type="text/javascript">
+		jQuery(function($) {
+			$(".btn-usuarios").click(function() {
+				$.ajaxSetup({cache : false});
+				$("#divExibir").load("../usuario/administrador/usuarios");
+				$(".divBase").hide("show");
+			});
+		
+			$(".btn-assinatura").click(function() {
+				$.ajaxSetup({cache : false});
+				$("#divExibir").load("../usuario/administrador/assinatura");
+				$(".divBase").hide("show");
+			});
+		});
+	</script>
+	
+	<div th:replace="usuario/menu"></div>
+					
+	<div class="row">
+		<div class="col-md-10 col-md-offset-1">
+			<h3>Administrador</h3>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-2 col-md-offset-1">	
+			<a href="#" class="btn-usuarios btn btn-primary btn-block" role="button">Usuarios</a>
+		</div>
+		<div class="col-md-2">	
+			<a href="#" class="btn-assinatura btn btn-primary btn-block" role="button">Assinatura</a>
+		</div>
+	</div>
+</div>
