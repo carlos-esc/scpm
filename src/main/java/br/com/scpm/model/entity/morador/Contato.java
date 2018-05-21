@@ -15,6 +15,6 @@ public class Contato extends EntityClass{
 	private String numero;
 	
 	@ManyToOne
-	@JoinColumn(name = "morador_id")
+	@JoinColumn(name = "morador_cpf")
 	private Morador morador;
 }

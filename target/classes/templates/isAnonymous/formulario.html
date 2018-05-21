@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<div th:replace="fragments/config-html-css-js :: header" />
-<head>
+<!-- <div th:replace="fragments/config-html-css-js :: header" /> -->
+<head th:fragment="./fragments/config-html-css-js :: header">
 
 <script type="text/javascript">
 	jQuery(function($) {
@@ -82,7 +82,7 @@
 									console.log(textStatus, errorThrown);
 								}
 							});
-							$(location).attr('href', '/');
+							//$(location).attr('href', '/');
 						}
 						
 					},
@@ -109,7 +109,6 @@
 		<form class="form form-group" id="form" th:object="${usuario}">
 			<div class="row">
 				<input type="hidden" th:field="${usuario.id}" name="id" />
-				<input type="hidden" th:field="${usuario.morador.id}" name="morador.id" />
 				<input type="hidden" th:field="${usuario.morador.endereco.id}" name="morador.endereco.id" />
 				<input type="hidden" th:field="${usuario.morador.contatos[0].id}" name="morador.contatos[0].id" />
 				<input type="hidden" th:field="${usuario.morador.contatos[1].id}" name="morador.contatos[1].id" />
@@ -282,7 +281,7 @@
 
 		</form>
 	</div>
- <div th:replace="fragments/footer :: footer" />
+ 
 </body>
 
 </html>

@@ -31,7 +31,7 @@ public class UsuarioService {
     		}
     	}
     	
-		if (usuario.getFaturas() == null) usuario.setSenha(new BCryptPasswordEncoder().encode(usuario.getSenha()));
+		if (usuario.getMorador().getFaturas() == null) usuario.setSenha(new BCryptPasswordEncoder().encode(usuario.getSenha()));
 		
 		Usuario usuarioDataCriacao = usuarioRepository.findById(usuario.getId());
 		if (usuarioDataCriacao != null) {

@@ -1,11 +1,13 @@
 package br.com.scpm.model.entity.fatura;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
 import br.com.scpm.model.entity.EntityClass;
-import br.com.scpm.model.entity.usuario.Usuario;
+import br.com.scpm.model.entity.morador.Morador;
 import lombok.Data;
 
 @Data
@@ -19,7 +21,6 @@ public class Fatura extends EntityClass {
 	private String dataPagamento;
 	
 	@ManyToOne
-	@JoinColumn(name = "usuario_id")
-	private Usuario	usuario;
-	
+	@JoinColumn(name = "morador_cpf")
+	private Morador morador;
 }

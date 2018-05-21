@@ -3,7 +3,7 @@
 		jQuery(function($) {
 			$(".btn-meuExtrato").click(function() {
 				$.ajaxSetup({cache : false});
-				$("#divExibir").load("../usuario/contribuinte/" + "login" + "/extrato"); //consulta extrato
+				$("#divExibir").load("../contribuinte/" + "login" + "/extrato"); //consulta extrato
 				$(".divBase").hide("slow");
 			});
 		

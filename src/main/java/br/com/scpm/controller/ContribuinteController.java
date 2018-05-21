@@ -12,7 +12,7 @@ import br.com.scpm.service.AutenticacaoService;
 import br.com.scpm.service.UsuarioService;
 
 @Controller
-@RequestMapping("/usuario/contribuinte")
+@RequestMapping("/contribuinte")
 public class ContribuinteController {
 	
 	@Autowired
@@ -24,7 +24,9 @@ public class ContribuinteController {
 	@GetMapping("/{login}/extrato") //retorna o extrato das faturas pagas
     public String contrExtrato(Model model, @PathVariable String login) {  
     	model.addAttribute("nome", autenticacaoService.isLogadoWhatName());
-    	model.addAttribute("faturas", login.equals("login") ? usuarioService.carregar(SecurityContextHolder.getContext().getAuthentication().getName()).getFaturas() : usuarioService.carregar(login).getFaturas());
-    	return "/usuario/contribuinte/extrato";
+    	model.addAttribute("faturas", login.equals("login")
+    			? usuarioService.carregar(SecurityContextHolder.getContext().getAuthentication().getName()).getMorador().getFaturas() 
+    			: usuarioService.carregar(login).getMorador().getFaturas());
+    	return "isAuthenticated/contribuinte/extrato";
     }
 }

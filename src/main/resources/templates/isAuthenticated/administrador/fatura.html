@@ -33,12 +33,15 @@
 				var dados = jQuery($("#formFatura")).serialize();
 
 				$.ajax({
-					url : "/administrador/usuario/" + $("#usuarioId").val() + "/fatura",
+					url : "/administrador/" + $("#usuarioId").val() + "/fatura",
 					type : "post",
 					data : dados,
 					success : function(response) {
 						console.log(response);
 						console.log("Gravado com sucesso!!!");
+						alert("Gravado com sucesso!!!");
+						$.ajaxSetup({cache : false});
+						$("#divExibir").load("../administrador/usuarios");
 					},
 					error : function(jqXHR, textStatus, errorThrown) {
 						console.log(textStatus, errorThrown);

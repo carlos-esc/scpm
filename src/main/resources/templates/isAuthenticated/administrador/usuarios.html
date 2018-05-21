@@ -20,7 +20,7 @@
 		$(".fatura").click(
 				function() {
 					$.ajaxSetup({cache : false});
-					$("#divExibir").load("../usuario/" + $(this).attr("id") + "/fatura");
+					$("#divExibir").load("../administrador/" + $(this).attr("id") + "/fatura");
 				});
 	});
 </script>

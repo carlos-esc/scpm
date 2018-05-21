@@ -29,10 +29,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.csrf().disable().authorizeRequests()
-                .antMatchers("/", "/home", "/cpfAutorizado", "/isAnonymous/**", "/temporario/login").permitAll()
-                .antMatchers("/usuario/administrador/**").hasAnyRole("ADMIN")
-                .antMatchers("/usuario/secretario/**").hasAnyRole("ADMIN", "SECRE")
-                .antMatchers("/usuario/contribuinte/**", "/isAuthenticated").hasAnyRole("ADMIN", "SECRE", "CONTR")
+                .antMatchers("/", "/home", "/cpfAutorizado", "/isAnonymous/**", "/usuario/**").permitAll()
+                .antMatchers("/administrador/**").hasAnyRole("ADMIN")
+                .antMatchers("/secretario/**").hasAnyRole("ADMIN", "SECRE")
+                .antMatchers("/contribuinte/**", "/isAuthenticated").hasAnyRole("ADMIN", "SECRE", "CONTR")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -73,6 +73,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
 	public void configure(WebSecurity web) throws Exception{
     	web.ignoring()
-			.antMatchers("/webjars/**", "/static/**", "/css/**", "/js/**", "/images/**");
+			.antMatchers("/webjars/**","/bootstrap-quick-search/**", "/static/**", "/css/**", "/js/**", "/images/**");
 	}
 }

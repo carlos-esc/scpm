@@ -1,5 +1,6 @@
 package br.com.scpm.model.entity.usuario;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -67,13 +68,10 @@ public class Usuario implements UserDetails{
 	          name = "usuario_id", referencedColumnName = "id"), 
 	        inverseJoinColumns = @JoinColumn(
 	          name = "role_id", referencedColumnName = "nomeRole")) 
-    private List<Role> roles;
+    private List<Role> roles = new ArrayList<>();
 	
 	@OneToOne(cascade = CascadeType.ALL)
-	private Morador morador;
-	
-	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-	private List<Fatura> faturas;
+	private Morador morador = new Morador();
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -41,7 +41,7 @@
 
 		$("#btnCancelar").click(function() {
 			if($("#role").val() == "ROLE_ADMIN"){
-				$("#divExibir").load("../usuario/administrador/usuarios");
+				$("#divExibir").load("../administrador/usuarios");
 			} else {
 				$("#divExibir").empty();
 				$(".divBase").show("show");
@@ -141,7 +141,7 @@
 		<form class="form form-group" id="form" th:object="${usuario}">
 			<div class="row">
 				<input type="hidden" th:field="${usuario.id}" name="id" />
-				<input type="hidden" th:field="${usuario.morador.id}" name="morador.id" />
+				<input type="hidden" th:field="${usuario.morador.cpf}" name="morador.cpf" />
 				<input type="hidden" th:field="${usuario.morador.endereco.id}" name="morador.endereco.id" />
 				<input type="hidden" th:field="${usuario.morador.contatos[0].id}" name="morador.contatos[0].id" />
 				<input type="hidden" th:field="${usuario.morador.contatos[1].id}" name="morador.contatos[1].id" />

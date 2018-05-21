@@ -1,11 +1,11 @@
 package br.com.scpm.controller;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.scpm.model.entity.cpfAutorizado.CpfAutorizado;
@@ -52,7 +52,7 @@ public class DefaultController {
     }
     
     @GetMapping("/isAnonymous/{cpf}/formulario")
-    public String cpfApto(Model model, String cpf) {
+    public String cpfApto(Model model, @PathVariable String cpf) {
     	Usuario usuario = new Usuario();
     	usuario.getMorador().setCpf(cpf);
     	model.addAttribute("usuario", usuario);

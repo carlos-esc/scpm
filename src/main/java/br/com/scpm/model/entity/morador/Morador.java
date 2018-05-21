@@ -4,23 +4,28 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import br.com.scpm.model.entity.EntityClass;
 import br.com.scpm.model.entity.assinatura.Assinatura;
+import br.com.scpm.model.entity.fatura.Fatura;
 import lombok.Data;
 
 @Data
 @Entity
-public class Morador extends EntityClass{
+public class Morador {
 	
 	@NotNull
 	private String nome;
 	
 	@NotNull
-	//@CPF
+	@Id
 	private String cpf;
 	
 	//@Email
@@ -35,4 +40,7 @@ public class Morador extends EntityClass{
 	
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<Assinatura> assinaturas;
+	
+	@OneToMany(mappedBy = "morador", cascade = CascadeType.ALL)
+	private List<Fatura> faturas;
 }
