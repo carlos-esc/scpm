@@ -3,7 +3,6 @@
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,13 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import br.com.scpm.model.entity.usuario.Role;
 import br.com.scpm.model.entity.usuario.Usuario;
+import br.com.scpm.service.AutenticacaoService;
 import br.com.scpm.service.RoleService;
 import br.com.scpm.service.UsuarioService;
 
 @Controller
-@RequestMapping("/usuario")
+@RequestMapping("/usuarios")
 public class UsuarioController {
 	
 	@Autowired
@@ -27,57 +26,44 @@ public class UsuarioController {
 	
 	@Autowired
 	private RoleService roleService;
+	
+	@Autowired
+	private AutenticacaoService autenticacaoService;
     
-    @GetMapping("/checks") //verifica se o: cpf, email e login já existem
-    public @ResponseBody String carregarChecks(@ModelAttribute Usuario usuario) {
-    	return usuarioService.checksCpfEmailLoginIfExistin(usuario.getMorador().getCpf(), usuario.getMorador().getEmail(), usuario.getLogin()).toString(); 
-    }
-    
-    @GetMapping("/{login}") //carregar usuário
-    public String carregarUsuario(Model model, @PathVariable String login, HttpServletRequest request) {
+	@GetMapping("/") // Listar todos
+	public String listarTodos(Model model) {
+		model.addAttribute("nome", autenticacaoService.isLogadoWhatName());
+		model.addAttribute("usuarios", usuarioService.listarTodos());
+		return "/usuario/listarTodos";
+	}
+	
+	@GetMapping("/{login}") //carregar usuário
+	public String carregarUsuario(Model model, @PathVariable String login, HttpServletRequest request) {
 
-    	Usuario usuario = new Usuario();
-    	if (login.equals("login")) {
-    		usuario = usuarioService.carregar(SecurityContextHolder.getContext().getAuthentication().getName());
-    	} else {
-    		usuario = usuarioService.carregar(login);
-    	}
-    	model.addAttribute("usuario", usuario);
-    	model.addAttribute("roles", roleService.listar());
-    	
-    	if (request.isUserInRole("ROLE_ADMIN")) {
-    		return "/isAuthenticated/administrador/formulario";
-    	} else if (request.isUserInRole("ROLE_SECRE")){
-    		return "/isAuthenticated/secretario/formulario";
-    	} else if (request.isUserInRole("ROLE_CONTR")) {
-    		return "/isAuthenticated/contribuinte/formulario";
-    	} else {
-    		return null;
-    	}
+	  	model.addAttribute("usuario", usuarioService.carregar(login));
+	   	model.addAttribute("roles", roleService.listar());
+	    	
+	   	return usuarioService.usuarioNivelAcesso(request);
+	}
+	
+	@PostMapping("/") //salvar usuario
+    public @ResponseBody String usuario(@ModelAttribute Usuario usuario) {	
+		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + usuario.getMorador().getCpf());
+		usuarioService.salvar(usuario);
+    	System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + usuario.getMorador().getCpf());
+    	return "Salvo com sucesso!!!!";
     }
-    
-    @GetMapping //carregar informações tela novo usuário
+	
+	@GetMapping("/novo") //carregar informações tela novo usuário
     public String administradorUsuarioFormulario(Model model, HttpServletRequest request) {
     	model.addAttribute("roles", roleService.listar());
     	model.addAttribute("usuario", new Usuario());
-    	if (request.isUserInRole("ROLE_ADMIN")) {
-    		return "/isAuthenticated/administrador/formulario";
-    	} else if (request.isUserInRole("ROLE_SECRE")){
-    		return "/isAuthenticated/secretario/formulario";
-    	} else if (request.isUserInRole("ROLE_CONTR")) {
-    		return "/isAuthenticated/contribuinte/formulario";
-    	} else {
-    		return null;
-    	}
+    	
+    	return usuarioService.usuarioNivelAcesso(request);
     }
-    
-    @PostMapping
-    public @ResponseBody String usuario(@ModelAttribute Usuario usuario) {	
-    	Role role = new Role();
-    	role.setNomeRole("ROLE_CONTR");
-    	usuario.setSituacao(true);
-    	usuario.getRoles().add(role);
-    	usuarioService.salvar(usuario);
-    	return "É nós!!!";
+	
+	@GetMapping("/cpfEmailLoginExiste") //verifica se o: cpf, email e login já existem
+    public @ResponseBody String cpfEmailLoginExiste(@ModelAttribute Usuario usuario) {
+    	return usuarioService.cpfEmailLoginExiste(usuario.getMorador().getCpf(), usuario.getMorador().getEmail(), usuario.getLogin()).toString(); 
     }
 }

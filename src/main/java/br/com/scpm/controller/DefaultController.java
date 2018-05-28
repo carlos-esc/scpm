@@ -6,12 +6,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.scpm.model.entity.cpfAutorizado.CpfAutorizado;
+import br.com.scpm.model.entity.usuario.Role;
 import br.com.scpm.model.entity.usuario.Usuario;
 import br.com.scpm.service.AutenticacaoService;
 import br.com.scpm.service.CpfAutorizadoService;
+import br.com.scpm.service.UsuarioService;
 
 @Controller
 public class DefaultController {
@@ -21,6 +24,9 @@ public class DefaultController {
 	
 	@Autowired
 	private CpfAutorizadoService cpfAutorizadoService;
+	
+	@Autowired
+	private UsuarioService usuarioService;
 	
 	@GetMapping("/")
     public String home1(Model model) {
@@ -51,12 +57,20 @@ public class DefaultController {
     	return cpfAutorizadoService.carregar(cpfAutorizado.getCpf()).toString();
     }
     
-    @GetMapping("/isAnonymous/{cpf}/formulario")
+    @GetMapping("/{cpf}/formulario")
     public String cpfApto(Model model, @PathVariable String cpf) {
     	Usuario usuario = new Usuario();
     	usuario.getMorador().setCpf(cpf);
     	model.addAttribute("usuario", usuario);
-    	return "/isAnonymous/formulario";
+    	return "/anonymous/formulario";
+    }
+
+    @PostMapping("/")
+    public void usuario(@ModelAttribute Usuario usuario) {	
+    	Role role = new Role();
+    	role.setNomeRole("ROLE_CONTR");
+    	usuario.getRoles().add(role);
+    	usuarioService.salvar(usuario);
     }
     
 }

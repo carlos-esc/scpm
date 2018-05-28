@@ -47,7 +47,7 @@
 				var dados = jQuery($("#form")).serialize();
 
 				$.ajax({
-					url : "/usuario/checks",
+					url : "/usuarios/cpfEmailLoginExiste",
 					type : "get",
 					data : dados,
 					success : function(response) {
@@ -71,7 +71,7 @@
 
 						if(checks == true){
 							$.ajax({
-								url : "/usuario",
+								url : "/isAnonymous/{cpf}/formulario",
 								type : "post",
 								data : dados,
 								success : function(response) {
@@ -251,22 +251,6 @@
 						data-required-error="Campo obrigatório"
 						data-minlength-error="Mínimo 6 caracteres" />
 					<div class="help-block with-errors"></div>
-				</div>
-				
-				<div sec:authorize="hasRole('ROLE_ADMIN')" class="form-group col-md-3">
-					<label for="nivelAcesso">Nível de acesso</label> <select
-						class="form-control" name="roles[0].nomeRole" th:field="${usuario.roles[0]}">
-						
-						<option th:each="role : ${roles}" th:value="${role.nomeRole}"
-							th:text="${role.descricao}"></option>
-					</select>
-				</div>
-				<div sec:authorize="hasRole('ROLE_ADMIN')" class="form-group col-md-2">
-					<label for="status">Situação</label> <select name="situacao" th:field="${usuario.situacao}"
-						class="form-control">
-						<option th:value="true" th:text="Ativo"></option>
-						<option th:value="false" th:text="Inativo"></option>
-					</select>
 				</div>
 			</div>
 

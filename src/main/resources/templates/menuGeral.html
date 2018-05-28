@@ -3,13 +3,13 @@
 		jQuery(function($) {
 			$(".btn-meuExtrato").click(function() {
 				$.ajaxSetup({cache : false});
-				$("#divExibir").load("../contribuinte/" + "login" + "/extrato"); //consulta extrato
+				$("#divExibir").load("/faturas/" + "0"); //consulta extrato
 				$(".divBase").hide("slow");
 			});
 		
 			$(".btn-meuCadastro").click(function() {
 				$.ajaxSetup({cache : false});
-				$("#divExibir").load("../usuario/" + "login"); //consulta cadastro
+				$("#divExibir").load("/usuarios/" + "usuarioLogado"); //consulta cadastro
 				$(".divBase").hide("slow");
 			});	
 		});

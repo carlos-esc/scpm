@@ -3,19 +3,19 @@
 		jQuery(function($) {
 			$(".btn-usuarios").click(function() {
 				$.ajaxSetup({cache : false});
-				$("#divExibir").load("../administrador/usuarios");
+				$("#divExibir").load("/usuarios/");
 				$(".divBase").hide("show");
 			});
 		
 			$(".btn-assinatura").click(function() {
 				$.ajaxSetup({cache : false});
-				$("#divExibir").load("../administrador/assinatura");
+				$("#divExibir").load("/administrador/assinatura");
 				$(".divBase").hide("show");
 			});
 		});
 	</script>
 	
-	<div th:replace="isAuthenticated/menuGenerico"></div>
+	<div th:replace="/menuGeral"></div>
 					
 	<div class="row">
 		<div class="col-md-10 col-md-offset-1">

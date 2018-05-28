@@ -10,11 +10,11 @@
 	<div th:replace="fragments/header :: header"></div>
 		
 		<div sec:authorize="isAnonymous()">
-			<div th:replace="isAnonymous/menu"></div>	
+			<div th:replace="/bemVindo"></div>	
 		</div>
 		
 		<div sec:authorize="isAuthenticated()">
-			<div th:replace="isAuthenticated/direcionaNivel"></div>
+			<div th:replace="/usuario/menuDirecionador"></div>
 		</div>
 
 	<div th:replace="fragments/footer :: footer"></div>

@@ -20,7 +20,7 @@ public class CpfAutorizadoService {
 		JSONObject checkCpf = new JSONObject();
 		
 		checkCpf.put("Autorizado", cpfAutorizadoRepository.findByCpf(cpf) != null ? true : false);
-		checkCpf.put("Cadastrado", moradorService.cpfExist(cpf));
+		checkCpf.put("Cadastrado", moradorService.findByCpf(cpf) != null ? true : false);
 		
 		return checkCpf;
 	}

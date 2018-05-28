@@ -4,7 +4,7 @@
 		$(".btn-novoUsuario").click(
 				function() {
 					$.ajaxSetup({cache : false});
-					$("#divExibir").load("../usuario");
+					$("#divExibir").load("../usuarios");
 				});
 		$(".btn-sair").click(
 				function() {
@@ -15,7 +15,7 @@
 		$(".usuario").click(
 				function() {
 					$.ajaxSetup({cache : false});
-					$("#divExibir").load("../usuario/" + $(this).attr("id")); //consulta cadastro
+					$("#divExibir").load("/usuarios/" + $(this).attr("id")); //consulta cadastro
 				});
 		$(".fatura").click(
 				function() {

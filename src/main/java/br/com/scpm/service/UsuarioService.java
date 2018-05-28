@@ -2,8 +2,11 @@ package br.com.scpm.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,31 @@ public class UsuarioService {
 	
 	@Autowired
 	private MoradorService moradorService;
+	
+	public Usuario carregar(String login) {
+		
+    	if (login.equals("usuarioLogado")) {
+    		return usuarioRepository.findByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
+    	} else {
+    		return usuarioRepository.findByLogin(login);
+    	}
+	}
+	
+	public List<Usuario> listarTodos(){
+		return (List<Usuario>) usuarioRepository.findAll();
+	}
+	
+	public String usuarioNivelAcesso (HttpServletRequest request) {
+		if (request.isUserInRole("ROLE_ADMIN")) {
+    		return "/usuario/adminFormulario";
+    	} else if (request.isUserInRole("ROLE_SECRE")){
+    		return "/isAuthenticated/secretario/formulario";
+    	} else if (request.isUserInRole("ROLE_CONTR")) {
+    		return "/isAuthenticated/contribuinte/formulario";
+    	} else {
+    		return null;
+    	}
+	}
 	
 	public Usuario salvar(Usuario usuario) {
 	
@@ -45,38 +73,15 @@ public class UsuarioService {
 		}
 		return usuarioRepository.save(usuario);
 	}
-	
-	public Usuario atualizar(Usuario usuario) {
-		return usuarioRepository.save(usuario);
-	}
-	
-	public Usuario carregar(String login) {
-		Usuario usuario = usuarioRepository.findByLogin(login);
-		return usuario;
-	}
-	
-	
-	
-	public JSONObject checksCpfEmailLoginIfExistin(String cpf, String email, String login){
+
+	public JSONObject cpfEmailLoginExiste(String cpf, String email, String login){
 		
-		//try {
-			JSONObject checksDados = new JSONObject();
+		JSONObject checksDados = new JSONObject();
 			
-			checksDados.put("cpf", moradorService.cpfExist(cpf));
-			checksDados.put("email", moradorService.emailExist(email));
-			checksDados.put("login", usuarioRepository.findByLogin(login) == null ? false : true);
+		checksDados.put("cpf", moradorService.findByCpf(cpf) == null ? false : true);
+		checksDados.put("email", moradorService.findByEmail(email) == null ? false : true);
+		checksDados.put("login", usuarioRepository.findByLogin(login) == null ? false : true);
 			
-			System.out.println("checksDados = " + checksDados);
-			
-		//} catch (JSONException e) {
-			//e.printStackTrace();
-		//}
-		
 		return checksDados;
 	}
-	
-	public List<Usuario> listar(){
-		return (List<Usuario>) usuarioRepository.findAll();
-	}
-	
 }
