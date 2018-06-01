@@ -4,7 +4,7 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		
+		var validator;
 		var email = "";
 		var login = ""; 
 		
@@ -39,70 +39,63 @@
 			}
 		});
 
+		$('#checkAlterarSenha').change(function() {
+	        if ($(this).is(':checked') == false) {
+	        	$(".divSenha *, .divRepitaSenha *").prop('disabled',true);
+	        	$("#senha, #senha2").val("");
+	        	$("#senha, #senha2").attr("required", false);
+	        	validator.reset(); //resets the whole validator
+	        }else{
+	        	$(".divSenha *, .divRepitaSenha *").prop('disabled',false);
+	        	$("#senha, #senha2").attr("required", true);
+	        }
+	    });
+		
 		$("#btnCancelar").click(function() {
 			if($("#role").val() == "ROLE_ADMIN"){
-				$("#divExibir").load("../");
+				$("#divExibir").load("/usuarios/");
 			} else {
 				$("#divExibir").empty();
 				$(".divBase").show("show");
 			}
 		});
-
+		
 		$("#form").validator();
 		$("#btnSalvar").click(function(e) {
-			if (!$("#form").data("bs.validator").validate().hasErrors()) {
+			validator = $("#form").data("bs.validator");
+			validator.validate();
+			if(!validator.hasErrors()){
 				console.log("Não contêm erros no formulário...");
 				var dados = jQuery($("#form")).serialize();
 
 				$.ajax({
-					url : "/usuario/checks",
+					url : "/usuarios/cpfEmailLoginExiste",
 					type : "get",
 					data : dados,
 					success : function(response) {
 						response = typeof response == 'string' ? JSON.parse(response) : response;
 						var checks = true;
-						if($("#id").val() == 0){
-							if(response["login"] == true){
+						
+						if (login != $("#login").val()) {
+							if(response["login"] == true){ 
 								$(".check-login").text("Login já cadastrado");
 								checks = false;
 							} else {
 								$(".check-login").text("");
-							}
-							if(response["cpf"] == true){
-								$(".check-cpf").text("CPF já cadastrado");
-								checks = false;
-							} else {
-								$(".check-cpf").text("");
-							}
-							if(response["email"] == true){
+							}	
+						}
+						 if(email != $("#email").val()){
+							 if(response["email"] == true){
 								$(".check-email").text("Email já cadastrado");
 								checks = false;
 							} else {
 								$(".check-email").text("");
-							}
-						} else {
-							if(login != $("#login").val()){
-								if(response["login"] == true){ 
-									$(".check-login").text("Login já cadastrado");
-									checks = false;
-								}
-							} else {
-								$(".check-login").text("");
-							}
-							if (email != $("#email").val()){
-								if(response["email"] == true){
-									$(".check-email").text("Email já cadastrado");
-									checks = false;
-								}
-							} else {
-								$(".check-email").text("");
-							}
-							
-						}
+							} 
+						 }	
 
 						if(checks == true){
 							$.ajax({
-								url : "/usuario",
+								url : "/usuarios/",
 								type : "post",
 								data : dados,
 								success : function(response) {
@@ -115,6 +108,9 @@
 							});
 							$("#divExibir").empty();
 							$(".divBase").show("slow");//Novo
+							$(".alert").fadeTo(4000, 500).slideUp(500, function(){
+							    $("#success-alert").alert('close');
+							});
 						}
 						
 					},
@@ -133,7 +129,6 @@
  
 </head>
 <body>
-
 	<div class="form-group" id="formularioUsuario">
 		<input id="role" type="hidden" th:field="${usuario.roles[0].nomeRole}"/>
 		<h3 id="cabecalho-pagina" class="page-header">Novo usuário</h3>
@@ -141,7 +136,6 @@
 		<form class="form form-group" id="form" th:object="${usuario}">
 			<div class="row">
 				<input type="hidden" th:field="${usuario.id}" name="id" />
-				<input type="hidden" th:field="${usuario.morador.cpf}" name="morador.cpf" />
 				<input type="hidden" th:field="${usuario.morador.endereco.id}" name="morador.endereco.id" />
 				<input type="hidden" th:field="${usuario.morador.contatos[0].id}" name="morador.contatos[0].id" />
 				<input type="hidden" th:field="${usuario.morador.contatos[1].id}" name="morador.contatos[1].id" />
@@ -268,53 +262,43 @@
 						data-minlength-error="Mínimo 6 caracteres" />
 					<div class="help-block with-errors check-login"></div>
 				</div>
-				<div class="form-group col-md-2">
+				<div class="form-group col-md-2 divSenha">
 					<label for="senha">Senha</label> <input type="password"
-						class="form-control" name="senha" id="senha" required="required"
+						class="form-control" name="senha" id="senha" 
 						data-minlength="6" maxlength="15" placeholder="Mín:6 Máx:15"
 						data-required-error="Campo obrigatório"
-						data-minlength-error="Mínimo 6 caracteres" />
+						data-minlength-error="Mínimo 6 caracteres" disabled="disabled"/>
 					<div class="help-block with-errors"></div>
 				</div>
-				<div class="form-group col-md-2">
+				<div class="form-group col-md-2 divRepitaSenha">
 					<label for="senha">Repita a Senha</label> <input type="password"
-						class="form-control" id="senha2" required="required"
+						class="form-control" id="senha2" 
 						data-minlength="6" maxlength="15" placeholder="Mín:6 Máx:15"
 						data-match="#senha" data-match-error="As senhas não são iguais."
 						data-required-error="Campo obrigatório"
-						data-minlength-error="Mínimo 6 caracteres" />
+						data-minlength-error="Mínimo 6 caracteres" disabled="disabled"/>
 					<div class="help-block with-errors"></div>
 				</div>
-				
-				<div sec:authorize="hasRole('ROLE_ADMIN')" class="form-group col-md-3">
-					<label for="nivelAcesso">Nível de acesso</label> <select
-						class="form-control" name="roles[0].nomeRole" th:field="${usuario.roles[0]}">
-						
-						<option th:each="role : ${roles}" th:value="${role.nomeRole}"
-							th:text="${role.descricao}"></option>
-					</select>
-				</div>
-				<div sec:authorize="hasRole('ROLE_ADMIN')" class="form-group col-md-2">
-					<label for="status">Situação</label> <select name="situacao" th:field="${usuario.situacao}"
-						class="form-control">
-						<option th:value="true" th:text="Ativo"></option>
-						<option th:value="false" th:text="Inativo"></option>
-					</select>
+				<div class="form-group col-md-2">
+					<label for="checkAlterarSenha">
+						Alterar Senha?<input type="checkbox" id="checkAlterarSenha" class="form-control" />
+					</label>
 				</div>
 			</div>
 
 			<hr />
 
 			<div class="row">
-				<div class="col-md-12">
-					<input type="submit" id="btnSalvar" class="btn btn-primary" value="Salvar" />
-					<button type="button" id="btnCancelar" class="btn btn-primary">Cancelar</button>
+				<div class="col-md-2">
+					<input type="submit" id="btnSalvar" class="btn btn-primary btn-block" value="Salvar" />
+				</div>
+				<div class="col-md-2">
+					<button type="button" id="btnCancelar" class="btn btn-primary btn-block">Cancelar</button>
 				</div>
 			</div>
 
 		</form>
 	</div>
- 
+ 	
 </body>
-
 </html>

@@ -2,6 +2,7 @@ package br.com.scpm.springSecurity.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -29,10 +30,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.csrf().disable().authorizeRequests()
-                .antMatchers("/", "/home", "/cpfAutorizado", "/isAnonymous/**", "/usuarios/**").permitAll()
-                .antMatchers("/administrador/**").hasAnyRole("ADMIN")
-                .antMatchers("/secretario/**").hasAnyRole("ADMIN", "SECRE")
-                .antMatchers("/contribuinte/**", "/isAuthenticated").hasAnyRole("ADMIN", "SECRE", "CONTR")
+                .antMatchers("/", "/home", "/novo", "/cadastrar","/cpfAutorizado", "/autoCadastroConcluido", "/**/formulario",  "/anonimo/**", "/usuarios/cpfEmailLoginExiste").permitAll()
+                .antMatchers(HttpMethod.GET, "/faturas/*").authenticated()
+                .antMatchers("/faturas/*").hasAnyRole("ADMIN")
+                .antMatchers("/usuarios/**").hasAnyRole("ADMIN", "SECRE", "CONTR")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

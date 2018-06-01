@@ -32,13 +32,14 @@ public class FaturaController {
 	
 	@GetMapping("/{cpf}/nova") // preencher nova fatura
 	public String nova(Model model, @PathVariable String cpf) {
-		model.addAttribute("usuario", moradorService.findByCpf(cpf));
+		model.addAttribute("morador", moradorService.findByCpf(cpf));
 		model.addAttribute("fatura", new Fatura());
 		return "/fatura/formulario";
 	}
 
-	@PostMapping("/{cpf}") // salvar fatura
+	@PostMapping("/{cpf}/") // salvar fatura
 	public @ResponseBody String salvar(@ModelAttribute Fatura fatura, @PathVariable String cpf) {
+		System.out.println("**************************************************CPF: " + cpf);
 		fatura.setMorador(moradorService.findByCpf(cpf));
 		faturaService.salvar(fatura);
 		return "É nós!!! fatura...";

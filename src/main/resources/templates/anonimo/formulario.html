@@ -1,103 +1,98 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<!-- <div th:replace="fragments/config-html-css-js :: header" /> -->
-<head th:fragment="./fragments/config-html-css-js :: header">
+<head>
 
-<script type="text/javascript">
-	jQuery(function($) {
+	<title>SCPM Auto Cadastro</title>
+
+	<div th:replace="fragments/config-html-css-js :: header" />
+	
+	<script type="text/javascript">
+		jQuery(function($) {
 		
-		var email = "";
-		var login = "";
-		
-		$("#cpf").attr("readonly", true);
-		$("#cpf").css("background-color", "#cccccc");
+			$("#cpf").attr("readonly", true);
+			$("#cpf").css("background-color", "#cccccc");
 			
-		
-		$(".cpf").mask("999.999.999-99", {
-			autoclear : false,
-			placeholder : ""
-		});
-		$(".cep").mask("99.999-999", {
-			autoclear : false,
-			placeholder : ""
-		});
+			$("#nome").focus();
+			
+			$(".cep").mask("99.999-999", {
+				autoclear : false,
+				placeholder : ""
+			});
+	
+			$(".telefone").keyup(function() {
+				if ($(this).val().length >= 15) {
+					$(this).mask('(99)99999-999?9', {
+						autoclear : false,
+						placeholder : ""
+					});
+				} else {
+					$(this).mask('(99)9999-9999?9', {
+						autoclear : false,
+						placeholder : ""
+					});
+				}
+			});
+	
+			$("#btnCancelar").click(function() {
+				$(location).attr('href', '/home');
+			});
 
-		$(".telefone").keyup(function() {
-			if ($(this).val().length >= 15) {
-				$(this).mask('(99)99999-999?9', {
-					autoclear : false,
-					placeholder : ""
-				});
-			} else {
-				$(this).mask('(99)9999-9999?9', {
-					autoclear : false,
-					placeholder : ""
-				});
-			}
-		});
-
-		$("#btnCancelar").click(function() {
-			$(location).attr('href', '/');
-		});
-
-		$("#form").validator();
-		$("#btnSalvar").click(function(e) {
-			if (!$("#form").data("bs.validator").validate().hasErrors()) {
-				console.log("Não contêm erros no formulário...");
-				var dados = jQuery($("#form")).serialize();
-
-				$.ajax({
-					url : "/usuarios/cpfEmailLoginExiste",
-					type : "get",
-					data : dados,
-					success : function(response) {
-						response = typeof response == 'string' ? JSON.parse(response) : response;
-						var checks = true;
-						
-							if(response["login"] == true){
+			$("#form").validator();
+			$("#btnSalvar").click(function(e) {
+				if (!$("#form").data("bs.validator").validate().hasErrors()) {
+					console.log("Não contêm erros no formulário...");
+					var dados = jQuery($("#form")).serialize();
+	
+					$.ajax({
+						url : "/usuarios/cpfEmailLoginExiste",
+						type : "get",
+						data : dados,
+						success : function(response) {
+							response = typeof response == 'string' ? JSON.parse(response) : response;
+							var checks = true;
+							
+							if(response["login"] == true){ 
 								$(".check-login").text("Login já cadastrado");
 								checks = false;
 							} else {
 								$(".check-login").text("");
 							}
-					
+								
 							if(response["email"] == true){
 								$(".check-email").text("Email já cadastrado");
 								checks = false;
 							} else {
 								$(".check-email").text("");
 							}
-					
-
-						if(checks == true){
-							$.ajax({
-								url : "/isAnonymous/{cpf}/formulario",
-								type : "post",
-								data : dados,
-								success : function(response) {
-									console.log(response);
-									console.log("Gravado com sucesso!!!");
-								},
-								error : function(jqXHR, textStatus, errorThrown) {
-									console.log(textStatus, errorThrown);
-								}
-							});
-							//$(location).attr('href', '/');
+	
+							if(checks == true){
+								$.ajax({
+									url : "/novo",
+									type : "post",
+									data : dados,
+									success : function(response) {
+										console.log(response);
+										console.log("Anônimo gravado com sucesso!!!");
+										$(".divNovoCadastro").load("/autoCadastroConcluido");
+									},
+									error : function(jqXHR, textStatus, errorThrown) {
+										console.log(textStatus, errorThrown);
+									}
+								});
+							}						
+						},
+						error : function(jqXHR, textStatus, errorThrown) {
+							console.log(textStatus, errorThrown);
 						}
-						
-					},
-					error : function(jqXHR, textStatus, errorThrown) {
-						console.log(textStatus, errorThrown);
-					}
-				});
-				return false;
-			} else {
-				console.log("Contêm erros no formulário... =(");
-			}
+					});
+					return false;
+				} else {
+					console.log("Contêm erros no formulário... =(");
+				}
+			});
+	
 		});
-
-	});
-</script>
+	</script>
  
 </head>
 <body>
@@ -252,6 +247,7 @@
 						data-minlength-error="Mínimo 6 caracteres" />
 					<div class="help-block with-errors"></div>
 				</div>
+	
 			</div>
 
 			<hr />

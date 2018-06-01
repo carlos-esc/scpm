@@ -2,15 +2,15 @@
 	<div id="divExibir"></div>
 	
 	<div sec:authorize="hasRole('ROLE_ADMIN')">
-		<div th:replace="/usuario/adminMenu"></div>
+		<div th:replace="/usuario/admin/menu"></div>
 	</div>	
 				
 	<div sec:authorize="hasRole('ROLE_SECRE')">
-		<div th:replace="/usuario/secreMenu"></div>
+		<div th:replace="/usuario/secre/menu"></div>
 	</div>
 			
 	<div sec:authorize="hasRole('ROLE_CONTR')">
-		<div th:replace="/usuario/contrMenu"></div>
+		<div th:replace="/usuario/contr/menu"></div>
 	</div>
 	
 	<br />

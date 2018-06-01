@@ -1,9 +1,7 @@
 package br.com.scpm.model.entity.fatura;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
 import br.com.scpm.model.entity.EntityClass;

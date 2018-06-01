@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.scpm.model.entity.morador.Contato;
+import br.com.scpm.model.entity.usuario.Role;
 import br.com.scpm.model.entity.usuario.Usuario;
 import br.com.scpm.model.entity.usuario.UsuarioRepository;
 
@@ -38,17 +39,17 @@ public class UsuarioService {
 	
 	public String usuarioNivelAcesso (HttpServletRequest request) {
 		if (request.isUserInRole("ROLE_ADMIN")) {
-    		return "/usuario/adminFormulario";
+    		return "/usuario/admin/formulario";
     	} else if (request.isUserInRole("ROLE_SECRE")){
-    		return "/isAuthenticated/secretario/formulario";
+    		return "/usuario/secre/formulario";
     	} else if (request.isUserInRole("ROLE_CONTR")) {
-    		return "/isAuthenticated/contribuinte/formulario";
+    		return "/usuario/contr/formulario";
     	} else {
     		return null;
     	}
 	}
 	
-	public Usuario salvar(Usuario usuario) {
+	public Usuario salvar(Usuario usuario, HttpServletRequest request) {
 	
 		for (int i = 0 ; i < usuario.getMorador().getContatos().size() ; i++) {
     		Contato contato = usuario.getMorador().getContatos().get(i);
@@ -59,18 +60,32 @@ public class UsuarioService {
     		}
     	}
     	
-		if (usuario.getMorador().getFaturas() == null) usuario.setSenha(new BCryptPasswordEncoder().encode(usuario.getSenha()));
+		if (usuario.getSenha() == null) {
+			usuario.setSenha(usuarioRepository.findByLogin(usuario.getLogin()).getSenha());
+		} else {
+			usuario.setSenha(new BCryptPasswordEncoder().encode(usuario.getSenha()));
+		}
 		
-		Usuario usuarioDataCriacao = usuarioRepository.findById(usuario.getId());
-		if (usuarioDataCriacao != null) {
-			if (usuarioDataCriacao.getDataCriacao() != null) {
-				usuario.setDataCriacao(usuarioDataCriacao.getDataCriacao());
-			}
+		
+		if (usuario.getId() != 0) {
+			usuario.setDataCriacao(usuarioRepository.findByLogin(usuario.getLogin()).getDataCriacao());
 		}
-		if (usuario.getRoles() == null) {
-			usuario.setRoles(usuarioRepository.findById(usuario.getId()).getRoles());
-			usuario.setSituacao(usuarioRepository.findById(usuario.getId()).isEnabled());
-		}
+		
+		if (request.isUserInRole("ROLE_ADMIN")) {
+			
+    	} else if (request.isUserInRole("ROLE_SECRE")){
+    		
+    	} else if (request.isUserInRole("ROLE_CONTR")) {
+    		Role role = new Role();
+        	role.setNomeRole("ROLE_CONTR");
+        	usuario.getRoles().add(role);
+        	usuario.setSituacao(true);
+    	} else {
+    		Role role = new Role();
+        	role.setNomeRole("ROLE_CONTR");
+        	usuario.getRoles().add(role);
+        	usuario.setSituacao(true);
+    	}
 		return usuarioRepository.save(usuario);
 	}
 

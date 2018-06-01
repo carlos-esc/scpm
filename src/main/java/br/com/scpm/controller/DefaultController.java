@@ -1,5 +1,7 @@
 package br.com.scpm.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -53,8 +55,18 @@ public class DefaultController {
     }
     
     @GetMapping("/cpfAutorizado") //verifica se o cpf esta autorizado a se cadastrar
-    public @ResponseBody String verificaCpf(@ModelAttribute CpfAutorizado cpfAutorizado, Model model) {
+    public @ResponseBody String cpfAutorizado(@ModelAttribute CpfAutorizado cpfAutorizado) {
     	return cpfAutorizadoService.carregar(cpfAutorizado.getCpf()).toString();
+    }
+    
+    @GetMapping("/cadastrar") //html verificacao de cpf para dar inicio ao auto cadastro
+    public String cpfVerificacao(@ModelAttribute CpfAutorizado cpfAutorizado, Model model) {
+    	return "/cadastrar";
+    }
+    
+    @GetMapping("/autoCadastroConcluido") 
+    public String autoCadastroConcluido() {
+    	return "/anonimo/autoCadastroConcluido";
     }
     
     @GetMapping("/{cpf}/formulario")
@@ -62,15 +74,13 @@ public class DefaultController {
     	Usuario usuario = new Usuario();
     	usuario.getMorador().setCpf(cpf);
     	model.addAttribute("usuario", usuario);
-    	return "/anonymous/formulario";
+    	return "/anonimo/formulario";
     }
 
-    @PostMapping("/")
-    public void usuario(@ModelAttribute Usuario usuario) {	
-    	Role role = new Role();
-    	role.setNomeRole("ROLE_CONTR");
-    	usuario.getRoles().add(role);
-    	usuarioService.salvar(usuario);
+    @PostMapping("/novo")
+    public @ResponseBody String usuario(@ModelAttribute Usuario usuario,HttpServletRequest request) {	
+    	usuarioService.salvar(usuario, request);
+    	return "Anônimo gravado com sucesso!!!";
     }
     
 }

@@ -20,7 +20,7 @@
 		$(".fatura").click(
 				function() {
 					$.ajaxSetup({cache : false});
-					$("#divExibir").load("../administrador/" + $(this).attr("id") + "/fatura");
+					$("#divExibir").load("/faturas/" + $(this).attr("id") + "/nova");
 				});
 	});
 </script>
@@ -79,7 +79,7 @@
 							<td th:text="${usuario.morador.endereco.rua}"></td>
 							<td th:text="${usuario.morador.endereco.numero}"></td>
 							<td>
-								<a href="#" th:id="${usuario.login}" class="fatura" title="Adicionar fatura paga" ><span class="glyphicon glyphicon-list-alt text-primary"></span></a>
+								<a href="#" th:id="${usuario.morador.cpf}" class="fatura" title="Adicionar fatura paga" ><span class="glyphicon glyphicon-list-alt text-primary"></span></a>
 								<a href="#" th:id="${usuario.login}" class="usuario" title="Alterar usuário" ><span class="glyphicon glyphicon-edit text-primary"></span></a> 
 								<a href="../administrador/usuario" title="Excluir usuário" ><span class="glyphicon glyphicon-remove text-danger"></span></a>
 							</td>

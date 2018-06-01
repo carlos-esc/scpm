@@ -34,7 +34,7 @@ public class UsuarioController {
 	public String listarTodos(Model model) {
 		model.addAttribute("nome", autenticacaoService.isLogadoWhatName());
 		model.addAttribute("usuarios", usuarioService.listarTodos());
-		return "/usuario/listarTodos";
+		return "/usuario/admin/listarTodos";
 	}
 	
 	@GetMapping("/{login}") //carregar usuário
@@ -47,10 +47,8 @@ public class UsuarioController {
 	}
 	
 	@PostMapping("/") //salvar usuario
-    public @ResponseBody String usuario(@ModelAttribute Usuario usuario) {	
-		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + usuario.getMorador().getCpf());
-		usuarioService.salvar(usuario);
-    	System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + usuario.getMorador().getCpf());
+    public @ResponseBody String usuario(@ModelAttribute Usuario usuario, HttpServletRequest request) {	
+		usuarioService.salvar(usuario,request);
     	return "Salvo com sucesso!!!!";
     }
 	

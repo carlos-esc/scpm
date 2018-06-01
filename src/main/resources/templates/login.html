@@ -1,87 +1,35 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>SCPM Login</title>
+	<title>SCPM Login</title>
 
 	<div th:replace="fragments/config-html-css-js :: header" />
+	
 	<script type="text/javascript">
-		jQuery(function($) {
-			$(".btnCadastro").click(function() {
-				$(".divLogin").hide("slow");
-				$(".divVerificaCpf").show("slow");
-				$("#cpf").val("");
-				$(".check-cpf").text("");
-				$.ajaxSetup({cache : false});
-				//$("#divUsuarioFormulario").load("../administrador/usuario/formulario/" + $(this).attr("id"));
-			});
-			
-			$(".cpf").mask("999.999.999-99", {
-				autoclear : false,
-				placeholder : ""
-			});
-			
-			$(".alert").fadeTo(2000, 500).slideUp(500, function(){
+		jQuery(function($) {			
+			$(".alert").fadeTo(4000, 500).slideUp(500, function(){
 			    $("#success-alert").alert('close');
 			});
-			
-			$("#formCpfAutorizado").validator();
-			$(".btnVerificar").click(function() {
-				if (!$("#formCpfAutorizado").data("bs.validator").validate().hasErrors()) {
-					console.log("Não contêm erros no formulário...");
-					var dados = jQuery($("#formCpfAutorizado")).serialize();
-
-					$.ajax({
-						url : "/cpfAutorizado",
-						type : "get",
-						data : dados,
-						success : function(response) {
-							response = typeof response == 'string' ? JSON.parse(response) : response;
-							if(!response["Autorizado"]){
-								$(".check-cpf").text("CPF não autorizado a se cadastrar");
-							} else if (response["Cadastrado"]){
-								$(".check-cpf").text("CPF já cadastrado");
-							} else {
-								$("#divNovoCadastro").load("../isAnonymous/"+ $("#cpf").val() + "/formulario");
-								$("#divLogin").hide("show");
-								//$(location).attr('href', '/isAnonymous/' + $("#cpf").val() + "/formulario");
-							}
-							
-						},
-						error : function(jqXHR, textStatus, errorThrown) {
-							console.log(textStatus, errorThrown);
-						}
-					});
-					return false;
-				} else {
-					console.log("Contêm erros no formulário... =(");
-				}
+			$("#btnLogin").click(function() {
+				if ($('#formLogin').validator('validate').has('.has-error').length) {
+			        
+			    } else {
+			        $("#formLogin").submit();
+			    }
 			});
-			
-			$(".btnCancelar").click(function() {
-				$(".divLogin").show("slow");
-				$(".divVerificaCpf").hide("slow");
-				$.ajaxSetup({cache : false});
-				$("#cpf").val("");
-				//$("#divUsuarioFormulario").load("../administrador/usuario/formulario/" + $(this).attr("id"));
-			});
-			
 		});
-			
 	</script>
+	
 </head>
 <body>
 
 	<div th:replace="fragments/header :: header" />
-	
-<div id="divNovoCadastro" class="container"></div>
 
-<div id="divLogin">	
 	<div sec:authorize="isAnonymous()" class="container">
 
 		<div class="row divLogin">
 			<div class="col-xs-12 col-sm-6 col-md-4 col-sm-offset-3 col-md-offset-4">
-				<form class="form-login" th:action="@{/signin}" method="post"
-					data-toggle="validator">
+				<form id="formLogin" th:action="@{/signin}" method="post">
 					<fieldset>
 						<h3 class="page-header">Login</h3>
 
@@ -114,56 +62,29 @@
 						</div>
 
 						<div class="row">
-							<div class="col-xs-5 col-sm-5 col-md-5 col-xs-offset-1 col-sm-offset-1 col-md-offset-1">
-								<input type="submit" class="btn btn-lg btn-primary btn-block btnLogin" value="Login" />
-							</div>
-							<div class="col-xs-5 col-sm-5 col-md-5">
-								<input type="button" class="btn btn-lg btn-primary btn-block btnCadastro" value="Cadastro" />
+							<div class="col-xs-6 col-sm-6 col-md-6 col-xs-offset-3 col-sm-offset-3 col-md-offset-3">
+								<a href="#" id="btnLogin" class="btn btn-lg btn-primary btn-block btnLogin">Login</a>
 							</div>
 						</div>
 					</fieldset>
 				</form>
-			</div>
-		</div>
-		
-		<div class="divVerificaCpf" style="display:none;">
-			<div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
-			<h4 class="page-header">Verifica se o CPF pertence a um morador contribuinte</h4>
-
-			<form id="formCpfAutorizado" class="form form-group" th:object="${cpfAutorizado}">
+				<br />
 				<div class="row">
-					<div class="col-md-8 col-md-offset-2 form-group">
-						<label for="cpf">CPF</label> 
-						<input type="text" name="cpf" id="cpf" placeholder="Digite o CPF" class="form-control cpf"
-						required="required" data-minlength="14" data-required-error="Campo obrigatório"
-						data-minlength-error="CPF com 11 números" />
-						<div class="help-block with-errors check-cpf"></div>
+					<div class="col-xs-12 col-sm-12 col-md-12">
+						<h4><a href="/cadastrar" id="btnCancelar" class="">Clique aqui para se cadastrar</a></h4>
 					</div>
 				</div>
-				
-				<div class="row">
-					<div class="col-xs-5 col-sm-5 col-md-5 col-xs-offset-1 col-sm-offset-1 col-md-offset-1">
-						<input type="submit" class="btn btn-lg btn-primary btn-block btnVerificar" value="Verificar" />
-					</div>
-					<div class="col-xs-5 col-sm-5 col-md-5">
-						<input type="button" class="btn btn-lg btn-primary btn-block btnCancelar" value="Cancelar" />
-					</div>
-				</div>
-			</form>
 			</div>
 		</div>
-		
-		<br />
 		<br />
 	</div>
-</div>	
+	
 	<div sec:authorize="isAuthenticated()" class="container">
 		<h3>Sr(a) <span th:text="${nome}"></span> já se encontra logado(a)!</h3>
 		<a href="/logout" class="btn btn-lg btn-primary" >Sair</a>
 		<br />
 		<br />
 	</div>
-	
 	<div th:replace="fragments/footer :: footer" />
 
 </body>
