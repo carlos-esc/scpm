@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>SCPM Login</title>
+
+	<div th:replace="/publico/fragments/config-html-css-js" />
+	
+	<script type="text/javascript">
+		jQuery(function($) {			
+			$(".alert").fadeTo(4000, 500).slideUp(500, function(){
+			    $("#success-alert").alert('close');
+			});
+			$(".btnLogin").click(function() {
+				if ($('#formLogin').validator('validate').has('.has-error').length) {
+			        
+			    } else {
+			        $("#formLogin").submit();
+			    }
+			});
+		});
+	</script>
+	
+</head>
+<body>
+
+	<div class="container">
+		<div th:replace="/publico/fragments/header" />
+	
+		<div sec:authorize="isAnonymous()">
+	
+			<div class="row divLogin">
+				<div class="col-xs-12 col-sm-6 col-md-4 col-sm-offset-3 col-md-offset-4">
+					<form id="formLogin" th:action="@{/signin}" method="post">
+						<fieldset>
+							<h3 class="page-header">Login</h3>
+	
+							<div th:if="${param.error}">
+								<div class="alert alert-danger">CPF ou Senha inválido.</div>
+							</div>
+							<div th:if="${param.logout}">
+								<div class="alert alert-info">Desconectado com sucesso!!!.
+								</div>
+							</div>
+	
+							<div class="form-group">
+								<label for="login">Login</label>
+								<input type="text" name="username" id="login" class="form-control input-lg" placeholder="Mín:6 Máx:15" autofocus="true"
+									required="required" maxlength="15" data-minlength="6"
+									data-required-error="Campo obrigatório" data-minlength-error="Mínimo 6 caracteres" />
+								<div class="help-block with-errors"></div>
+							</div>
+							<div class="form-group">
+								<label for="senha">Senha</label>
+								<input type="password" name="password" id="senha" class="form-control input-lg" placeholder="Mín:6 Máx:15" 
+									required="true" maxlength="15" data-minlength="6" 
+									data-required-error="Campo obrigatório" data-minlength-error="Mínimo 6 caracteres"/>
+								<div class="help-block with-errors"></div>
+							</div>
+	
+							<div class="row form-group">
+								<div class="col-xs-6 col-sm-6 col-md-6 col-xs-offset-3 col-sm-offset-3 col-md-offset-3">
+									<button type="submit" class="btn btn-lg btn-primary btn-block btnLogin">Login</button>
+								</div>
+							</div>
+						</fieldset>
+					</form>
+					<br />
+					<div class="row">
+						<div class="col-xs-12 col-sm-12 col-md-12">
+							<h4><a href="/anonimo/cadastrar" id="btnCadastrar" class="">Clique aqui para se cadastrar</a></h4>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div sec:authorize="isAuthenticated()">
+			<h3>Sr(a) <span th:text="${nome}"></span> já se encontra logado(a)!</h3>
+			<a href="/logout" class="btn btn-lg btn-primary" >Sair</a>
+		</div>
+		<div th:replace="/publico/fragments/footer" />
+	</div>
+</body>
+</html>

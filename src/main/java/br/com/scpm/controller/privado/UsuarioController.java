@@ -1,8 +1,9 @@
-	package br.com.scpm.controller;
+	package br.com.scpm.controller.privado;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,34 +31,53 @@ public class UsuarioController {
 	@Autowired
 	private AutenticacaoService autenticacaoService;
     
-	@GetMapping("/") // Listar todos
-	public String listarTodos(Model model) {
-		model.addAttribute("nome", autenticacaoService.isLogadoWhatName());
-		model.addAttribute("usuarios", usuarioService.listarTodos());
-		return "/usuario/admin/listarTodos";
+//metodos comuns a todos usuários INÍCIO
+	@GetMapping("/meuCadastro") //carrega usuário logado
+	public String meuCadastro(Model model, HttpServletRequest request) {
+
+	  	model.addAttribute("usuario", usuarioService.carregar(SecurityContextHolder.getContext().getAuthentication().getName()));
+	    	
+	   	return usuarioService.usuarioNivelAcesso(request);
 	}
+//metodos comuns a todos usuários FIM	
+
+
+//metodos comuns a admin/secre INÍCIO
+	@GetMapping("/novoCadastro") // cadastro novo usuário
+    public String administradorUsuarioFormulario(Model model, HttpServletRequest request) {
+    	
+		model.addAttribute("roles", roleService.listar());
+    	model.addAttribute("usuario", new Usuario());
+    	
+    	return usuarioService.usuarioNivelAcesso(request);
+    }
 	
-	@GetMapping("/{login}") //carregar usuário
+	@GetMapping("/") // Lista todos os usuários
+	public String listarTodos(Model model, HttpServletRequest request) {
+		
+		model.addAttribute("nome", autenticacaoService.isLogadoWhatName());
+		model.addAttribute("usuarios", usuarioService.listarTodos(request));
+		
+		return model.asMap().get("usuarios") == null ? "/publico/error/403" : "/privado/usuario/admin/listarTodos";
+	}
+//metodos admin/secre FIM	
+
+	
+	@GetMapping("/admin/{login}") //carrega usuário
 	public String carregarUsuario(Model model, @PathVariable String login, HttpServletRequest request) {
 
 	  	model.addAttribute("usuario", usuarioService.carregar(login));
-	   	model.addAttribute("roles", roleService.listar());
+	   	model.addAttribute("roles", roleService.listar()); //carrega os roles caso necessite mudar nível de acesso
 	    	
 	   	return usuarioService.usuarioNivelAcesso(request);
 	}
 	
-	@PostMapping("/") //salvar usuario
+	@PostMapping("/admin/") //salvar usuário
     public @ResponseBody String usuario(@ModelAttribute Usuario usuario, HttpServletRequest request) {	
+		
 		usuarioService.salvar(usuario,request);
-    	return "Salvo com sucesso!!!!";
-    }
-	
-	@GetMapping("/novo") //carregar informações tela novo usuário
-    public String administradorUsuarioFormulario(Model model, HttpServletRequest request) {
-    	model.addAttribute("roles", roleService.listar());
-    	model.addAttribute("usuario", new Usuario());
     	
-    	return usuarioService.usuarioNivelAcesso(request);
+		return "Salvo com sucesso!!!!";
     }
 	
 	@GetMapping("/cpfEmailLoginExiste") //verifica se o: cpf, email e login já existem

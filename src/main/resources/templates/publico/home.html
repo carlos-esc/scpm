@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Sistema para Controle de Pagamento dos Moradores</title>
+
+<div th:replace="/publico/fragments/config-html-css-js"></div>
+
+</head>
+<body>
+	
+	<div class="container">
+		<div th:replace="/publico/fragments/header"></div>
+			
+		<div sec:authorize="isAnonymous()">
+			<div th:replace="/publico/bemVindo"></div>	
+		</div>
+			
+		<div sec:authorize="isAuthenticated()">
+			<div th:replace="/privado/usuario/menu"></div>
+		</div>
+	
+		<div th:replace="/publico/fragments/footer"></div>
+	</div>
+</body>
+</html>

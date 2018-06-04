@@ -1,4 +1,6 @@
-package br.com.scpm.controller;
+package br.com.scpm.controller.privado;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,22 +26,21 @@ public class FaturaController {
 	@Autowired
 	private MoradorService moradorService;
 	
-	@GetMapping("/{cpf}") //retorna o extrato das faturas do cpf informado
-    public String listarTodas(Model model, @PathVariable String cpf) {  
-		model.addAttribute("faturas", faturaService.listarTodas(cpf));
-    	return "/fatura/listarTodas";
+	@GetMapping("/{cpf}/") //retorna o extrato das faturas do cpf informado
+    public String listarTodas(Model model, @PathVariable String cpf, HttpServletRequest request) {  
+		model.addAttribute("faturas", faturaService.listarTodas(cpf, request));
+		return model.asMap().get("faturas") == null ? "/publico/error/403" : "/privado/fatura/listarTodas";
     }
 	
 	@GetMapping("/{cpf}/nova") // preencher nova fatura
 	public String nova(Model model, @PathVariable String cpf) {
 		model.addAttribute("morador", moradorService.findByCpf(cpf));
 		model.addAttribute("fatura", new Fatura());
-		return "/fatura/formulario";
+		return "/private/fatura/formulario";
 	}
 
 	@PostMapping("/{cpf}/") // salvar fatura
 	public @ResponseBody String salvar(@ModelAttribute Fatura fatura, @PathVariable String cpf) {
-		System.out.println("**************************************************CPF: " + cpf);
 		fatura.setMorador(moradorService.findByCpf(cpf));
 		faturaService.salvar(fatura);
 		return "É nós!!! fatura...";

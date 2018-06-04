@@ -33,17 +33,22 @@ public class UsuarioService {
     	}
 	}
 	
-	public List<Usuario> listarTodos(){
-		return (List<Usuario>) usuarioRepository.findAll();
+	public List<Usuario> listarTodos(HttpServletRequest request){
+		
+		if (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_SECRE")) {
+			return (List<Usuario>) usuarioRepository.findAll();
+    	}  else {
+    		return null;
+    	}
 	}
 	
 	public String usuarioNivelAcesso (HttpServletRequest request) {
 		if (request.isUserInRole("ROLE_ADMIN")) {
-    		return "/usuario/admin/formulario";
+    		return "/privado/usuario/admin/formulario";
     	} else if (request.isUserInRole("ROLE_SECRE")){
-    		return "/usuario/secre/formulario";
+    		return "/privado/usuario/secre/formulario";
     	} else if (request.isUserInRole("ROLE_CONTR")) {
-    		return "/usuario/contr/formulario";
+    		return "/privado/usuario/contr/formulario";
     	} else {
     		return null;
     	}

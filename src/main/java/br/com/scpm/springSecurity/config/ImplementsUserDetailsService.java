@@ -23,18 +23,11 @@ public class ImplementsUserDetailsService implements UserDetailsService{
 	@Override
 	public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException, DataAccessException {
 		
-		System.out.println("===================================================== AQUI");
 		Usuario usuario = usuarioService.carregar(login);
-		System.out.println("===================================================== AQUI");
 		if (usuario  != null) {
-			System.out.println("===================================================== AQUI IF " + usuario.getLogin());
 			return new User(usuario.getUsername(), usuario.getPassword(), true, true, true, usuario.isEnabled(), usuario.getAuthorities());
 		} else {
-			System.out.println("===================================================== AQUI ELSE");
 			throw new UsernameNotFoundException("usuário não localizado!");
 		}
-		
-		
-		
 	}
 }

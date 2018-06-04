@@ -2,6 +2,9 @@ package br.com.scpm.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.swing.JOptionPane;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,11 +28,15 @@ public class FaturaService {
 		faturaRepository.save(fatura);
 	}
 	
-	public List<Fatura> listarTodas(String cpf){
-		if (cpf.equals("0")) {
+	public List<Fatura> listarTodas(String cpf, HttpServletRequest request){
+		if (cpf.equals("todas")) {
 			return usuarioService.carregar(SecurityContextHolder.getContext().getAuthentication().getName()).getMorador().getFaturas();
 		} else {
-			return moradorService.findByCpf(cpf).getFaturas();
+			if(request.isUserInRole("ROLE_ADMIN")) {
+				return moradorService.findByCpf(cpf).getFaturas();
+			} else {
+				return null;
+			}
 		}
 	}
 	

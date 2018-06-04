@@ -1,4 +1,4 @@
-package br.com.scpm.controller;
+package br.com.scpm.controller.privado;
 
 import java.security.Principal;
 
